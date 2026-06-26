@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>لوحة الأدمن</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Tahoma;
+}
+
+body{
+background:#111827;
+padding:20px;
+}
+
+.box{
+max-width:500px;
+margin:auto;
+background:#1f2937;
+padding:25px;
+border-radius:20px;
+box-shadow:0 5px 20px rgba(0,0,0,.4);
+}
+
+h1{
+color:white;
+text-align:center;
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+height:50px;
+margin-bottom:15px;
+border:none;
+outline:none;
+padding:15px;
+border-radius:12px;
+font-size:18px;
+}
+
+button{
+width:100%;
+height:55px;
+border:none;
+border-radius:12px;
+background:#2563eb;
+color:white;
+font-size:20px;
+cursor:pointer;
+transition:.3s;
+margin-bottom:10px;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+.msg{
+color:#22c55e;
+text-align:center;
+margin-top:15px;
+font-size:18px;
+}
+
+.list{
+margin-top:30px;
+}
+
+.game{
+background:#374151;
+padding:15px;
+border-radius:12px;
+margin-bottom:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.game span{
+color:white;
+font-size:18px;
+}
+
+.delete{
+background:#dc2626;
+width:100px;
+height:40px;
+font-size:16px;
+margin:0;
+}
+
+.delete:hover{
+background:#b91c1c;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="box">
+
+<h1>🎮 لوحة الأدمن</h1>
+
+<input
+type="text"
+id="name"
+placeholder="اسم اللعبة">
+
+<input
+type="text"
+id="image"
+placeholder="رابط صورة اللعبة">
+
+<input
+type="text"
+id="link"
+placeholder="رابط التحميل">
+
+<button onclick="addGame()">
+إضافة اللعبة
+</button>
+
+<div class="msg" id="msg"></div>
+
+<div class="list" id="gamesList"></div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+
+firebase.initializeApp({
+apiKey:"AIzaSyAUc2cH9gVE7RECiW19XQXJNZQxVH96sFE",
+authDomain:"zezo-59a8d.firebaseapp.com",
+databaseURL:"https://zezo-59a8d-default-rtdb.firebaseio.com",
+projectId:"zezo-59a8d"
+});
+
+const db = firebase.database();const gamesList=document.getElementById("gamesList");
+
+function addGame(){
+
+let name=document.getElementById("name").value.trim();
+let image=document.getElementById("image").value.trim();
+let link=document.getElementById("link").value.trim();
+
+if(name==""||image==""||link==""){
+alert("املأ جميع البيانات");
+return;
+}
+
+db.ref("games").push({
+name:name,
+image:image,
+link:link
+});
+
+document.getElementById("msg").innerHTML="✅ تم إضافة اللعبة بنجاح";
+
+document.getElementById("name").value="";
+document.getElementById("image").value="";
+document.getElementById("link").value="";
+
+}
+
+db.ref("games").on("value",snap=>{
+
+gamesList.innerHTML="";
+
+snap.forEach(item=>{
+
+let data=item.val();
+let key=item.key;
+
+gamesList.innerHTML+=`
+
+<div class="game">
+
+<span>${data.name}</span>
+
+<button
+class="delete"
+onclick="deleteGame('${key}')">
+
+حذف
+
+</button>
+
+</div>
+
+`;
+
+});
+
+});function deleteGame(key){
+
+if(confirm("هل تريد حذف اللعبة؟")){
+
+db.ref("games/"+key).remove();
+
+document.getElementById("msg").innerHTML=
+"🗑️ تم حذف اللعبة";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
